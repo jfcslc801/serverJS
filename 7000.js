@@ -1,23 +1,56 @@
-// Require/import the HTTP module
+// We require/import the HTTP module
 var http = require("http");
 
-// Define a port to listen for incoming requests
-var PORT = 7000;
+var url = require("url");
 
-// Create a generic function to handle requests and responses
-function handleRequest(request, response) {
+// ===================================================================== Then
+// define the ports we want to listen to
+var PORTONE = 7000;
 
- response.end("you rock" + request.url);
-
+// ===================================================================== We need
+// two different functions to handle requests, one for each server.
+function handleRequestOne(req, res) {
+  // puts together a url object we are using
+  var urlParts = url.parse(req.url);
+  // switch statement that changes baised on the url passed in
+  switch (urlParts.pathname) {
+    // if we are at localhost:7000/ then run display root
+    case "/":
+      displayRoot(urlParts, req, res);
+      break;
+    case "/portfolio":
+    // if we are at localhost:7000/portfolio run portfolio
+      portfolio(urlParts, req, res);
+      break;
+    default:
+      break;
+  }
 }
+function portfolio(url, req, res) {
+  var myHTML = "<html>";
+  myHTML += "<body> <h1> Portfolio </h1>";
+  myHTML += "<p> Here are some of my Projects: <a href='https://github.com/jfcslc801'>Github</a></p>";
+  myHTML += "<a href='/'>Home</a>";
+  myHTML += "</body></html>"
+  res.writeHead(200, {"Content-Type": "text/html"});
+  res.end(myHTML);
+}
+function displayRoot(url, req, res) {
+  var myHTML = "<html>";
+  myHTML += "<body> <h1> Home Page </h1>";
+  myHTML += "<p> This is my home page welcome</p>";
+  myHTML += "<a href='/portfolio'>Portfolio</a>";
+  myHTML += "</body></html>"
+  res.writeHead(200, {"Content-Type": "text/html"});
+  res.end(myHTML);
+}
+// ===================================================================== Create
+// our servers
+var serverOne = http.createServer(handleRequestOne);
 
-// Use the Node HTTP package to create our server. Pass the handleRequest
-// function to empower it with functionality.
-var server = http.createServer(handleRequest);
-
-// Start our server so that it can begin listening to client requests.
-server.listen(PORT, function () {
-
-  // Log (server-side) when our server has started
-  console.log("Server listening on: http://localhost:" + PORT);
+// =====================================================================
+// Starting our servers
+serverOne.listen(PORTONE, function () {
+  // Callback triggered when server is successfully listening. Hurray!
+  console.log("Server listening on: http://localhost:" + PORTONE);
 });
